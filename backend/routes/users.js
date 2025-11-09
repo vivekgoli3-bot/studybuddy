@@ -1,7 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const User = require('../models/User');
+import express from 'express';
+import User from '../models/User.js';
 
+const router = express.Router();
 
 router.post('/', async (req, res) => {
   try {
@@ -14,7 +14,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-
 router.get('/', async (req, res) => {
   try {
     const users = await User.find().sort('-createdAt');
@@ -24,4 +23,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

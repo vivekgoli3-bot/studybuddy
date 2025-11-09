@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "studybuddy-476716",
+  "private_key_id": "f77590cc9db4fcc9ebe9217955b62f15286b848a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDIqX0/ygd1dG7x\nl5mupxwQ3D4DUJUKGtgC76t+SVfLACzDf7aaYLSbIDxMbg+x3Wj9keOIc0tg1D3y\nkbNAqZoD68XuBJLz8OLiflCnEuSLATAbRnr5Njpldk1z2Hw+OUv8nx9zDOEdv7eN\nsdVdK9lUK1zHFtfD7HlrQAit1TogBWt1verZ1A9K4uSxtyeCE/iX4Jzc71hrfY3Z\nQuQTVr1oj9vguboqFOSP6QH+g8yPhBb5iJvl+2Ai5uBrjKHQ87df5YhJWEo7Um9o\nKl+Pp9yrqOZ1/KQAG7IqZKBLFVWgrQK+qnP0/CxRquqtCQqUiZfZ3Gq4v0hLiOrI\nJs46jOgNAgMBAAECggEACAyshpOPKwoJrU1cj+IKQS7kmfNwlyAujCebJIzCpdUS\n9qC37Yd1l0d6w8IihQsRvCJPE1k0q+S3u3RW0YA8Om4J2Zt7XafLIjTY/WrHmj/o\n8x8nrbmcLBfL0ZrcmQ5pWu/zLgVVPoFDVr7MhVlN9Y9rwFzNOQHSeRfvgTGtjD05\nIMil2odR1gMU7D5esJ15xnVAUEy2JMi/SSbbAyryBKKnIy9cXhPZOUHRKjLmSXel\n3XlJ8yFWwnTphtEG14hDcGoyoCukqpgi4PGsHb8FWuKtsGxnHmqYLCkZh9njIO+L\nVEGfrmKof3FRukh9Iusmhb9TsZ93IlfzuSL/53tTTQKBgQD8nXHcU4lioOjpaz36\npsfMgkhX6UUhMiPCKxIVmRwBWuq0B34JMB+ykm430e0xIITNyc484GfMf45l/FKo\nhSY28mv0isDcNq0bg2QT+69RoEaP7i2+PRhIbU156jz6vfKSLkK6mnCFJm2H/hi/\n1oBBPZRnvlfMsH9bQPPpjP7CTwKBgQDLWdQHNEji3qoj2WJlVfl2Y2UrYsSPsKVz\nFCEECBwLEMsOi/dHq76J0ABZBbqvpuWkzgujb5cXy+LAxBV9xQZfKBTjEdJCqbdk\nu1Yc5PlP8lr6mSHO/lfHutMEZij73U6ei3GQpl4wpzdt0qeC/FQtVU8sqOKvuFbF\n2t8MjhSk4wKBgEteKhdjMQ0lFvh1T5OV6OyCPlVEOqTR0ctfkFCzUqCw4G+AAMF7\nAyoC+DFdR5gtrJG9UPPmu/FOaUzSQFMZDrK8FytprmrFQVaBF/3CTKdc21Cb7jfh\nAHqzabcjBLiGrXWhqbUE2OdQ9MLrM7UgqTlNxxZAuu9OBWFTerJGp8ePAoGAP6hr\nO6YeewcBdB+FMfvsECelcCOHLQQ7hv7yJvTy8nPbXT5rtsAI8dNviG7Gtl4k3aay\n9gLk5copvfakU67uA7PkdgEKNVwz0RDkMD9t3J0d5f0yHD569EeD74ibo9zv06oL\nbyDls41lSLf9QIAFSfu+wVhNPn0SjPWrhZ6kz8kCgYAP9ewh3ehV1FTacqMQ/z2k\n/IV1y7UnRUyL9QogI8T8Y7eHtueaBpE20+NU7QK/fdpbwJbVCHbAyB0MJDtEmq7d\noU4NL0n0D8ucznoW+5kpw1cqXy3QMgKJ758LnJpPsZ5gD5s7jChmJbXAZd28IfPb\nD1e1FGRGtBvr4YfIz0hzcg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "studybuddy@studybuddy-476716.iam.gserviceaccount.com",
+  "client_id": "111252232767674553272",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/studybuddy%40studybuddy-476716.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,8 +1,8 @@
 
-const express = require('express');
-const router = express.Router();
-const UserLogin = require('../models/UserLogin');
+import express from 'express';
+import UserLogin from '../models/UserLogin.js';
 
+const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {
@@ -13,13 +13,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-
 router.post('/', async (req, res) => {
-  const { gmail, password } = req.body;
+  const { gmail, password, username } = req.body;
 
   try {
-    
-    const user = await UserLogin.findOne({ gmail, password });
+    const user = await UserLogin.findOne({ gmail, password, username });
 
     if (user) {
       res.status(200).json({
@@ -29,7 +27,7 @@ router.post('/', async (req, res) => {
     } else {
       res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: 'Invalid username, email or password',
       });
     }
   } catch (err) {
@@ -40,4 +38,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

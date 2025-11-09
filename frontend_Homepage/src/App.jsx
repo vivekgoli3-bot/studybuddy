@@ -34,7 +34,8 @@ export default function AuthPage() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!isLogin && !formData.username.trim()) {
+    // username is mandatory for both login and signup
+    if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
     }
 
@@ -71,11 +72,9 @@ export default function AuthPage() {
     try {
       const endpoint = isLogin ? '/api/user_login' : '/api/user_signup';
       
+      // send payload in requested order/format: gmail, password, username
+      const payload = { gmail: formData.email, password: formData.password, username: formData.username };
       
-      const payload = isLogin 
-        ? { gmail: formData.email, password: formData.password }
-        : { username: formData.username, gmail: formData.email, password: formData.password };
-
       console.log('Making request to:', `http://localhost:5000${endpoint}`);
       console.log('Payload:', payload);
 
@@ -139,7 +138,7 @@ export default function AuthPage() {
     });
   };
 
-  if (isAuthenticated) return <StudyBuddy />;
+  if (isAuthenticated) return <StudyBuddy username={formData.username} />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
@@ -177,7 +176,7 @@ export default function AuthPage() {
           </div>
 
           <div className="space-y-4">
-            {!isLogin && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Username
@@ -199,28 +198,28 @@ export default function AuthPage() {
                   <p className="mt-1 text-sm text-red-500">{errors.username}</p>
                 )}
               </div>
-            )}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition`}
-                  placeholder="Enter your email"
-                />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={`w-full pl-10 pr-4 py-3 border ${
+                      errors.email ? 'border-red-500' : 'border-gray-300'
+                    } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition`}
+                    placeholder="Enter your email"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-500">{errors.email}</p>
-              )}
             </div>
 
             <div>
