@@ -447,6 +447,97 @@ const StudyBuddy = ({ username }) => {
   const [showTotalClassesDetails, setShowTotalClassesDetails] = useState(false);
   const [cgpaData, setCgpaData] = useState(null);
   const [cgpaLoading, setCgpaLoading] = useState(true);
+  const [showCgpaModal, setShowCgpaModal] = useState(false);
+  const [showAddCgpaModal, setShowAddCgpaModal] = useState(false);
+  const [semester, setSemester] = useState('');
+  const [sgpa, setSgpa] = useState('');
+  const [updateCgpaLoading, setUpdateCgpaLoading] = useState(false);
+  const [sgpaValues, setSgpaValues] = useState({
+    sem1: '',
+    sem2: '',
+    sem3: '',
+    sem4: '',
+    sem5: '',
+    sem6: '',
+    sem7: '',
+    sem8: ''
+  });
+  const [addCgpaLoading, setAddCgpaLoading] = useState(false);
+
+  const handleAddCgpa = async () => {
+    try {
+      setAddCgpaLoading(true);
+      const cleanedSgpa = Object.fromEntries(
+        Object.entries(sgpaValues)
+          .filter(([_, value]) => value !== '')
+          .map(([key, value]) => [key, parseFloat(value)])
+      );
+
+      const response = await fetch('http://localhost:5000/api/cgpa_distribution', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: username,
+          sgpa: cleanedSgpa
+        })
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        setCgpaData(updatedData);
+        setShowAddCgpaModal(false);
+        setSgpaValues({
+          sem1: '',
+          sem2: '',
+          sem3: '',
+          sem4: '',
+          sem5: '',
+          sem6: '',
+          sem7: '',
+          sem8: ''
+        });
+      } else {
+        console.error('Failed to add CGPA');
+      }
+    } catch (error) {
+      console.error('Error adding CGPA:', error);
+    } finally {
+      setAddCgpaLoading(false);
+    }
+  };
+
+  const handleCgpaUpdate = async () => {
+    try {
+      setUpdateCgpaLoading(true);
+      const response = await fetch(`http://localhost:5000/api/cgpa_distribution/${username}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          semester: semester,
+          sgpa: parseFloat(sgpa)
+        })
+      });
+
+      if (response.ok) {
+        // Refresh CGPA data after update
+        const updatedData = await response.json();
+        setCgpaData(updatedData);
+        setShowCgpaModal(false);
+        setSemester('');
+        setSgpa('');
+      } else {
+        console.error('Failed to update CGPA');
+      }
+    } catch (error) {
+      console.error('Error updating CGPA:', error);
+    } finally {
+      setUpdateCgpaLoading(false);
+    }
+  };
 
   // Fetch CGPA data from grades API
   useEffect(() => {
@@ -1435,7 +1526,138 @@ const StudyBuddy = ({ username }) => {
           </div>
           
           <div className="bg-gradient-to-br from-purple-100 to-pink-100 p-6 rounded-lg">
-            <h4 className="font-semibold text-blue-900 mb-4">CGPA Distribution</h4>
+            <div className="flex justify-between items-center mb-4">
+              <h4 className="font-semibold text-blue-900">CGPA Distribution</h4>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowAddCgpaModal(true)}
+                  className="px-3 py-1 bg-green-600 text-white rounded-md hover:bg-green-700 text-sm"
+                >
+                  Add CGPA
+                </button>
+                <button
+                  onClick={() => setShowCgpaModal(true)}
+                  className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
+                >
+                  Update CGPA
+                </button>
+              </div>
+            </div>
+
+            {/* Add CGPA Modal */}
+            {showAddCgpaModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+                  <h3 className="text-lg font-semibold mb-4">Add CGPA</h3>
+                  <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                    {Object.keys(sgpaValues).map((sem) => (
+                      <div key={sem}>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          {sem.charAt(0).toUpperCase() + sem.slice(1)} SGPA
+                        </label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="10"
+                          value={sgpaValues[sem]}
+                          onChange={(e) => setSgpaValues(prev => ({
+                            ...prev,
+                            [sem]: e.target.value
+                          }))}
+                          className="w-full border rounded-md px-3 py-2"
+                          placeholder="Enter SGPA"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex justify-end space-x-3">
+                    <button
+                      onClick={() => setShowAddCgpaModal(false)}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddCgpa}
+                      disabled={addCgpaLoading || Object.values(sgpaValues).every(v => v === '')}
+                      className={`px-4 py-2 bg-green-600 text-white rounded-md ${
+                        addCgpaLoading || Object.values(sgpaValues).every(v => v === '')
+                          ? 'opacity-50 cursor-not-allowed'
+                          : 'hover:bg-green-700'
+                      }`}
+                    >
+                      {addCgpaLoading ? 'Adding...' : 'Add CGPA'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* CGPA Update Modal */}
+            {showCgpaModal && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl w-96">
+                  <h3 className="text-lg font-semibold mb-4">Update CGPA</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Semester
+                      </label>
+                      <select
+                        value={semester}
+                        onChange={(e) => setSemester(e.target.value)}
+                        className="w-full border rounded-md px-3 py-2"
+                      >
+                        <option value="">Select Semester</option>
+                        <option value="SEM1">Semester 1</option>
+                        <option value="SEM2">Semester 2</option>
+                        <option value="SEM3">Semester 3</option>
+                        <option value="SEM4">Semester 4</option>
+                        <option value="SEM5">Semester 5</option>
+                        <option value="SEM6">Semester 6</option>
+                        <option value="SEM7">Semester 7</option>
+                        <option value="SEM8">Semester 8</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        SGPA
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="10"
+                        value={sgpa}
+                        onChange={(e) => setSgpa(e.target.value)}
+                        className="w-full border rounded-md px-3 py-2"
+                        placeholder="Enter SGPA"
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-end space-x-3">
+                    <button
+                      onClick={() => setShowCgpaModal(false)}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleCgpaUpdate}
+                      disabled={!semester || !sgpa || updateCgpaLoading}
+                      className={`px-4 py-2 bg-blue-600 text-white rounded-md ${
+                        (!semester || !sgpa || updateCgpaLoading)
+                          ? 'opacity-50 cursor-not-allowed'
+                          : 'hover:bg-blue-700'
+                      }`}
+                    >
+                      {updateCgpaLoading ? 'Updating...' : 'Update'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
             {loading ? (
               <div className="text-center">Loading...</div>
             ) : error ? (

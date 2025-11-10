@@ -27,6 +27,9 @@ import updateAttendanceRoute from "./routes/updateAttendance.js";
 import cgpaDistributionRoute from "./routes/cgpa_distribution.js";
 import attendanceSummaryRoute from "./routes/attendance_summary.js";
 import todoSummaryRoute from "./routes/todo_summary.js";
+import userRegisterRoute from "./routes/user_register.js";
+
+
 
 
 
@@ -75,6 +78,7 @@ app.use("/api/update_attendance", updateAttendanceRoute);
 app.use("/api/cgpa_distribution", cgpaDistributionRoute);
 app.use("/api/attendance_summary", attendanceSummaryRoute);
 app.use("/api/todo_summary", todoSummaryRoute);
+app.use("/api/user_register", userRegisterRoute);
 
 
 

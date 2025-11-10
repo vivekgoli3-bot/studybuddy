@@ -70,10 +70,14 @@ export default function AuthPage() {
     setServerResponse(null);
 
     try {
-      const endpoint = isLogin ? '/api/user_login' : '/api/user_signup';
+      const endpoint = isLogin ? '/api/user_login' : '/api/user_register';
       
-      // send payload in requested order/format: gmail, password, username
-      const payload = { gmail: formData.email, password: formData.password, username: formData.username };
+      // Create payload in the required format
+      const payload = {
+        username: formData.username,
+        gmail: formData.email,
+        password: formData.password
+      };
       
       console.log('Making request to:', `http://localhost:5000${endpoint}`);
       console.log('Payload:', payload);
@@ -104,16 +108,28 @@ export default function AuthPage() {
       } else {
         setServerResponse({ 
           error: false, 
-          message: data.message || `${isLogin ? 'Login' : 'Signup'} successful!`, 
+          message: data.message || `${isLogin ? 'Login' : 'Registration'} successful!`, 
           data 
         });
         
-        try {
-          if (data && data.token) localStorage.setItem('token', data.token);
-        } catch (e) {
-          
+        if (isLogin) {
+          try {
+            if (data && data.token) localStorage.setItem('token', data.token);
+          } catch (e) {
+            console.error('Error saving token:', e);
+          }
+          setIsAuthenticated(true);
+        } else {
+          // If registration is successful, switch to login page after 2 seconds
+          setTimeout(() => {
+            setIsLogin(true);
+            setFormData(prev => ({
+              ...prev,
+              password: '',
+              confirmPassword: ''
+            }));
+          }, 2000);
         }
-        setIsAuthenticated(true);
       }
     } catch (err) {
       console.error('Request error:', err);
