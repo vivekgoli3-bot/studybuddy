@@ -1279,6 +1279,74 @@ const StudyBuddy = ({ username }) => {
             </div>
           </div>
         )}
+
+        {showUpdateAttendance && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-bold text-gray-900">Update Attendance</h3>
+                  <button 
+                    onClick={() => setShowUpdateAttendance(false)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                  <input
+                    type="text"
+                    value={updateAttendance.subjectName}
+                    readOnly
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">New Classes Conducted</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={updateAttendance.newClassTaken}
+                    onChange={(e) => setUpdateAttendance(prev => ({ ...prev, newClassTaken: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">New Classes Attended</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={updateAttendance.newClassesAttended}
+                    onChange={(e) => setUpdateAttendance(prev => ({ ...prev, newClassesAttended: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-2 mt-6">
+                  <button
+                    onClick={() => setShowUpdateAttendance(false)}
+                    className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleUpdateAttendance}
+                    disabled={updatingAttendance || updateAttendance.newClassTaken === '' || updateAttendance.newClassesAttended === ''}
+                    className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {updatingAttendance ? 'Updating...' : 'Update Attendance'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
