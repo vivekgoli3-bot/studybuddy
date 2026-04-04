@@ -1,0 +1,25 @@
+services:
+  - type: web
+    runtime: node
+    name: study-buddy
+    buildCommand: npm install --prefix backend && npm install --prefix frontend_Homepage && npm run build --prefix frontend_Homepage
+    startCommand: npm start --prefix backend
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.12.0
+      - key: CLIENT_DIST_DIR
+        value: frontend_Homepage/dist
+      - key: MONGODB_URI
+        sync: false
+      - key: COHERE_API_KEY
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: REDIRECT_URI
+        sync: false

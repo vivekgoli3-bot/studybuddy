@@ -79,10 +79,10 @@ export default function AuthPage() {
         password: formData.password
       };
       
-      console.log('Making request to:', `http://localhost:5000${endpoint}`);
+      console.log('Making request to:', endpoint);
       console.log('Payload:', payload);
 
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -135,7 +135,7 @@ export default function AuthPage() {
       console.error('Request error:', err);
       setServerResponse({ 
         error: true, 
-        message: `Network error: ${err.message}. Is the server running on http://localhost:5000?` 
+        message: `Network error: ${err.message}. Check that the backend is running and reachable.` 
       });
     } finally {
       setLoading(false);

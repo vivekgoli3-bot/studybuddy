@@ -22,7 +22,7 @@ const FSDModuleQuiz = ({ subject = 'FSD', module = 'MODULE 1', onBack, username 
       setQuestionsError('');
       setQuestions([]);
       try {
-        const url = `http://localhost:5000/api/fetch_quiz_subjects/${encodeURIComponent(subject)}/${encodeURIComponent(module)}`;
+        const url = `/api/fetch_quiz_subjects/${encodeURIComponent(subject)}/${encodeURIComponent(module)}`;
         const res = await fetch(url);
         const data = await res.json();
         if (data && data.success && Array.isArray(data.questions)) {
@@ -104,7 +104,7 @@ const FSDModuleQuiz = ({ subject = 'FSD', module = 'MODULE 1', onBack, username 
     const grade = getGradeForScore(percentage);
 
     try {
-      const response = await fetch('http://localhost:5000/api/quiz_scores', {
+      const response = await fetch('/api/quiz_scores', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

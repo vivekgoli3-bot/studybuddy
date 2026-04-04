@@ -19,7 +19,7 @@ export default function QuizPracticeSection({ username }) {
     const fetchSubjects = async () => {
       setLoading(true);
       try {
-        const response = await fetch('http://localhost:5000/api/fetch_quiz_subjects');
+        const response = await fetch('/api/fetch_quiz_subjects');
         const data = await response.json();
         
         if (data.success && Array.isArray(data.subjects)) {
@@ -45,7 +45,7 @@ export default function QuizPracticeSection({ username }) {
     setModules([]);
     
     try {
-      const response = await fetch(`http://localhost:5000/api/fetch_quiz_subjects/${subject}`);
+      const response = await fetch(`/api/fetch_quiz_subjects/${subject}`);
       const data = await response.json();
       
       if (data.success && Array.isArray(data.modules)) {
@@ -65,7 +65,7 @@ export default function QuizPracticeSection({ username }) {
     setLeaderboardLoading(true);
     setLeaderboardError('');
     try {
-      const response = await fetch('http://localhost:5000/api/fetch_total_scores');
+      const response = await fetch('/api/fetch_total_scores');
       const data = await response.json();
       
       if (data.success && Array.isArray(data.leaderboard)) {
