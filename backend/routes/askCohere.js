@@ -2,7 +2,7 @@ import express from "express";
 import { CohereClient } from "cohere-ai";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const router = express.Router();
 

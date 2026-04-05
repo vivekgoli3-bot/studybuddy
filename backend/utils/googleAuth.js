@@ -4,7 +4,7 @@ import { google } from "googleapis";
 import dotenv from "dotenv";
 
 // Load environment variables from .env file
-dotenv.config();
+dotenv.config({ quiet: true });
 
 // Get values safely from environment
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
