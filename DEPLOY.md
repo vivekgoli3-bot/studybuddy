@@ -1,6 +1,6 @@
 # Deploying Study Buddy
 
-This branch is scoped to deployment-only fixes and is ready to connect to Render as a single Node web service.
+This branch is prepared for Koyeb using the root-level `Dockerfile`.
 
 ## What This Branch Includes
 
@@ -8,22 +8,23 @@ This branch is scoped to deployment-only fixes and is ready to connect to Render
 - Vite dev proxy for local development
 - backend runtime config driven by environment variables
 - production static serving for `frontend_Homepage/dist`
-- Render Blueprint config in `render.yaml`
+- Docker-based deployment for Koyeb
 - Node version pinning for local and CI environments
 
-## Render Setup
+## Koyeb Setup
 
-Render can read the root-level `render.yaml` Blueprint file directly:
+Deploy this repo from GitHub with these choices:
 
-- service type: `web`
-- runtime: `node`
-- build command: `npm install --prefix backend && npm install --prefix frontend_Homepage && npm run build --prefix frontend_Homepage`
-- start command: `npm start --prefix backend`
-- health check path: `/api/health`
+1. Create a new App in Koyeb.
+2. Choose GitHub as the source.
+3. Select this repository and the branch `codex-deploy-koyeb`.
+4. Choose the Dockerfile builder.
+5. Keep the default Dockerfile path as `Dockerfile`.
+6. Create a single web Service.
+
+The container builds the frontend and runs the backend, so no separate build or run command is required in Koyeb.
 
 ## Required Environment Variables
-
-Render should prompt for these values because they are marked `sync: false` in `render.yaml`:
 
 - `MONGODB_URI`
 - `COHERE_API_KEY`
@@ -31,11 +32,18 @@ Render should prompt for these values because they are marked `sync: false` in `
 - `GOOGLE_CLIENT_SECRET`
 - `REDIRECT_URI`
 
-The Blueprint also sets these defaults:
+Recommended values:
 
 - `NODE_ENV=production`
-- `NODE_VERSION=22.12.0`
 - `CLIENT_DIST_DIR=frontend_Homepage/dist`
+
+If Koyeb does not auto-populate it, set:
+
+- `REDIRECT_URI=https://<your-koyeb-domain>/api/oauth2callback`
+
+## Important Note
+
+Koyeb's current pricing FAQ says each organization gets one free web Service, but it also says a credit card is required for account validation before you can access platform resources.
 
 ## Local Notes
 
