@@ -10,12 +10,10 @@ import usersRouter from './routes/users.js';
 import userRegisterRouter from './routes/user_register.js';
 import userLoginRouter from './routes/userLogin.js';
 import attendanceRoutes from './routes/attendance.js';
-import uploadRoutes from './routes/uploadToDrive.js';
 import notesRoutes from './routes/notes.js';
 import fetchNotesRoutes from './routes/fetch_notes.js';
 import fetchTodosRoute from './routes/fetch_todos.js';
 import fetchResourceLibraryRoute from './routes/fetch_resource_library.js';
-import uploadResourceLibraryRouter from './routes/uploadResourceLibrary.js';
 import resourceLibraryRoutes from './routes/resourceLibrary.js';
 import todosRoute from './routes/todos.js';
 import discussionForumRoutes from './routes/discussion_forum.js';
@@ -116,6 +114,16 @@ mongoose.connection.on('disconnected', () => {
   mongoConnectionPromise = null;
 });
 
+let uploadRoutes = null;
+let uploadResourceLibraryRouter = null;
+
+if (!isVercel) {
+  ({ default: uploadRoutes } = await import('./routes/uploadToDrive.js'));
+  ({ default: uploadResourceLibraryRouter } = await import(
+    './routes/uploadResourceLibrary.js'
+  ));
+}
+
 app.use(
   cors({
     origin: allowedOrigins.length ? allowedOrigins : true,
@@ -159,10 +167,23 @@ const requireDatabaseConnection = async (req, res, next) => {
   }
 };
 
+const unsupportedOnVercel = (req, res) => {
+  res.status(501).json({
+    success: false,
+    error: 'Google Drive upload routes are not supported on this Vercel deployment.',
+  });
+};
+
 app.use('/api/users', requireDatabaseConnection, usersRouter);
 app.use('/api/user_login', requireDatabaseConnection, userLoginRouter);
 app.use('/api/attendance', requireDatabaseConnection, attendanceRoutes);
-app.use('/api', uploadRoutes);
+if (uploadRoutes) {
+  app.use('/api', uploadRoutes);
+} else {
+  app.get('/api/auth', unsupportedOnVercel);
+  app.get('/api/oauth2callback', unsupportedOnVercel);
+  app.post('/api/upload', unsupportedOnVercel);
+}
 app.use('/api/notes', requireDatabaseConnection, notesRoutes);
 app.use('/api/fetch_notes', requireDatabaseConnection, fetchNotesRoutes);
 app.use('/api/fetch_todos', requireDatabaseConnection, fetchTodosRoute);
@@ -171,7 +192,11 @@ app.use(
   requireDatabaseConnection,
   fetchResourceLibraryRoute
 );
-app.use('/api', uploadResourceLibraryRouter);
+if (uploadResourceLibraryRouter) {
+  app.use('/api', uploadResourceLibraryRouter);
+} else {
+  app.post('/api/resource_upload', unsupportedOnVercel);
+}
 app.use('/api/resource_library', requireDatabaseConnection, resourceLibraryRoutes);
 app.use('/api/todos', requireDatabaseConnection, todosRoute);
 app.use('/api/discussion_forum', requireDatabaseConnection, discussionForumRoutes);
