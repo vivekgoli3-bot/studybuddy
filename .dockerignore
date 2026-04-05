@@ -1,0 +1,17 @@
+.git
+.gitignore
+.DS_Store
+
+backend/node_modules
+frontend/node_modules
+frontend_Homepage/node_modules
+
+backend/.env
+backend/.env.save
+frontend/.env
+frontend_Homepage/.env
+
+frontend_Homepage/dist
+
+coverage
+npm-debug.log*
