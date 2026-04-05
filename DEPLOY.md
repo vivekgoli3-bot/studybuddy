@@ -1,29 +1,32 @@
 # Deploying Study Buddy
 
-This branch is scoped to deployment-only fixes and is ready to connect to Render as a single Node web service.
+This branch is prepared for Vercel as a no-card hosting option for the app layer.
 
 ## What This Branch Includes
 
 - frontend API calls switched from hardcoded `localhost` URLs to relative `/api/...` requests
 - Vite dev proxy for local development
 - backend runtime config driven by environment variables
-- production static serving for `frontend_Homepage/dist`
-- Render Blueprint config in `render.yaml`
+- Vercel serverless wrapper for the Express API
+- Vercel build step that publishes the React app to `public/`
 - Node version pinning for local and CI environments
 
-## Render Setup
+## Vercel Setup
 
-Render can read the root-level `render.yaml` Blueprint file directly:
+Deploy this repo from GitHub with these choices:
 
-- service type: `web`
-- runtime: `node`
-- build command: `npm install --prefix backend && npm install --prefix frontend_Homepage && npm run build --prefix frontend_Homepage`
-- start command: `npm start --prefix backend`
-- health check path: `/api/health`
+1. Import the repository into Vercel.
+2. Select the branch `codex-deploy-vercel`.
+3. Keep the project root at the repository root.
+4. Let Vercel read `vercel.json`.
+
+The project uses:
+
+- `installCommand`: `npm install --prefix backend && npm install --prefix frontend_Homepage`
+- `buildCommand`: builds `frontend_Homepage` and copies the output to `public/`
+- `api/[...route].js`: serves the Express backend on `/api/*`
 
 ## Required Environment Variables
-
-Render should prompt for these values because they are marked `sync: false` in `render.yaml`:
 
 - `MONGODB_URI`
 - `COHERE_API_KEY`
@@ -31,11 +34,18 @@ Render should prompt for these values because they are marked `sync: false` in `
 - `GOOGLE_CLIENT_SECRET`
 - `REDIRECT_URI`
 
-The Blueprint also sets these defaults:
+Recommended values:
 
 - `NODE_ENV=production`
-- `NODE_VERSION=22.12.0`
 - `CLIENT_DIST_DIR=frontend_Homepage/dist`
+
+For production OAuth callbacks, set:
+
+- `REDIRECT_URI=https://<your-vercel-domain>/api/oauth2callback`
+
+## Important Note
+
+Vercel Hobby is the strongest no-card hosting option I found for the app itself. The remaining possible blocker is your database provider and any third-party APIs, which may have their own signup requirements.
 
 ## Local Notes
 

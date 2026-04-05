@@ -53,6 +53,7 @@ const allowedOrigins = (process.env.CORS_ORIGIN || '')
   .filter(Boolean);
 
 const app = express();
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 
 app.use(
   cors({
@@ -105,7 +106,7 @@ app.use('/users', usersRouter);
 app.use('/register', userRegisterRouter);
 app.use('/login', userLoginRouter);
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && !isVercel) {
   if (existsSync(clientIndexPath)) {
     app.use(express.static(clientDistDir));
     app.get('/{*splat}', (req, res, next) => {
@@ -120,4 +121,8 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
-app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`));
+if (!isVercel) {
+  app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`));
+}
+
+export default app;
