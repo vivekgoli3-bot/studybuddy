@@ -10,12 +10,10 @@ import usersRouter from './routes/users.js';
 import userRegisterRouter from './routes/user_register.js';
 import userLoginRouter from './routes/userLogin.js';
 import attendanceRoutes from './routes/attendance.js';
-import uploadRoutes from './routes/uploadToDrive.js';
 import notesRoutes from './routes/notes.js';
 import fetchNotesRoutes from './routes/fetch_notes.js';
 import fetchTodosRoute from './routes/fetch_todos.js';
 import fetchResourceLibraryRoute from './routes/fetch_resource_library.js';
-import uploadResourceLibraryRouter from './routes/uploadResourceLibrary.js';
 import resourceLibraryRoutes from './routes/resourceLibrary.js';
 import todosRoute from './routes/todos.js';
 import discussionForumRoutes from './routes/discussion_forum.js';
@@ -30,17 +28,18 @@ import cgpaDistributionRoute from './routes/cgpa_distribution.js';
 import attendanceSummaryRoute from './routes/attendance_summary.js';
 import todoSummaryRoute from './routes/todo_summary.js';
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const PORT = Number(process.env.PORT) || 5000;
 const HOST = process.env.HOST || '0.0.0.0';
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL === 'true';
 const mongoUri =
   process.env.MONGODB_URI ||
   process.env.MONGO_URI ||
-  'mongodb://127.0.0.1:27017/StudyBuddy_DB';
+  (isVercel ? '' : 'mongodb://127.0.0.1:27017/StudyBuddy_DB');
 const clientDistDir = path.resolve(
   __dirname,
   '..',
@@ -54,6 +53,77 @@ const allowedOrigins = (process.env.CORS_ORIGIN || '')
 
 const app = express();
 
+mongoose.set('bufferCommands', false);
+
+let mongoConnectionPromise = null;
+let mongoConnectionError = null;
+
+const getDatabaseStatus = () => {
+  switch (mongoose.connection.readyState) {
+    case 0:
+      return 'disconnected';
+    case 1:
+      return 'connected';
+    case 2:
+      return 'connecting';
+    case 3:
+      return 'disconnecting';
+    default:
+      return 'unknown';
+  }
+};
+
+const ensureMongoConnection = async () => {
+  if (mongoose.connection.readyState === 1) {
+    return mongoose.connection;
+  }
+
+  if (!mongoUri) {
+    mongoConnectionError = new Error(
+      'MONGODB_URI is not configured for this deployment.'
+    );
+    throw mongoConnectionError;
+  }
+
+  if (!mongoConnectionPromise) {
+    mongoConnectionPromise = mongoose
+      .connect(mongoUri, {
+        serverSelectionTimeoutMS: 10000,
+      })
+      .catch((error) => {
+        mongoConnectionPromise = null;
+        mongoConnectionError = error;
+        throw error;
+      });
+  }
+
+  return mongoConnectionPromise;
+};
+
+mongoose.connection.on('connected', () => {
+  mongoConnectionError = null;
+  console.log('MongoDB connected');
+});
+
+mongoose.connection.on('error', (error) => {
+  mongoConnectionError = error;
+  console.error('MongoDB connection error:', error.message);
+});
+
+mongoose.connection.on('disconnected', () => {
+  mongoConnectionPromise = null;
+});
+
+let uploadRoutes = null;
+let uploadResourceLibraryRouter = null;
+
+if (!isVercel) {
+  ({ default: uploadRoutes } = await import('./routes/uploadToDrive.js'));
+  ({ default: uploadResourceLibraryRouter } = await import(
+    './routes/uploadResourceLibrary.js'
+  ));
+}
+
 app.use(
   cors({
     origin: allowedOrigins.length ? allowedOrigins : true,
@@ -66,46 +136,87 @@ app.get('/test', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true });
+  const configured = Boolean(mongoUri);
+  const databaseStatus = getDatabaseStatus();
+  const ok = configured && databaseStatus === 'connected';
+
+  res.status(ok ? 200 : 503).json({
+    ok,
+    database: {
+      configured,
+      status: databaseStatus,
+      error: mongoConnectionError?.message ?? null,
+    },
+  });
 });
 
-mongoose
-  .connect(mongoUri)
-  .then(() => console.log('MongoDB connected'))
-  .catch((err) => {
-    console.error('MongoDB connection error:', err.message);
-    process.exit(1);
+const requireDatabaseConnection = async (req, res, next) => {
+  try {
+    await ensureMongoConnection();
+    return next();
+  } catch (error) {
+    const missingMongoUri = !mongoUri;
+
+    return res.status(503).json({
+      success: false,
+      error: missingMongoUri
+        ? 'Database unavailable. Set MONGODB_URI in your Vercel project settings.'
+        : 'Database unavailable. Check your MongoDB connection settings.',
+      details: error.message,
+    });
+  }
+};
+
+const unsupportedOnVercel = (req, res) => {
+  res.status(501).json({
+    success: false,
+    error: 'Google Drive upload routes are not supported on this Vercel deployment.',
   });
+};
 
-app.use('/api/users', usersRouter);
-app.use('/api/user_login', userLoginRouter);
-app.use('/api/attendance', attendanceRoutes);
-app.use('/api', uploadRoutes);
-app.use('/api/notes', notesRoutes);
-app.use('/api/fetch_notes', fetchNotesRoutes);
-app.use('/api/fetch_todos', fetchTodosRoute);
-app.use('/api/fetch_resource_library', fetchResourceLibraryRoute);
-app.use('/api', uploadResourceLibraryRouter);
-app.use('/api/resource_library', resourceLibraryRoutes);
-app.use('/api/todos', todosRoute);
-app.use('/api/discussion_forum', discussionForumRoutes);
-app.use('/api/fetch_quiz_subjects', fetchQuizSubjectsRoutes);
-app.use('/api/quiz_scores', quizScoresRoutes);
-app.use('/api/fetch_total_scores', fetchTotalScoresRoutes);
-app.use('/api/upcoming_classes', fetchUpcomingClassesRoutes);
+app.use('/api/users', requireDatabaseConnection, usersRouter);
+app.use('/api/user_login', requireDatabaseConnection, userLoginRouter);
+app.use('/api/attendance', requireDatabaseConnection, attendanceRoutes);
+if (uploadRoutes) {
+  app.use('/api', uploadRoutes);
+} else {
+  app.get('/api/auth', unsupportedOnVercel);
+  app.get('/api/oauth2callback', unsupportedOnVercel);
+  app.post('/api/upload', unsupportedOnVercel);
+}
+app.use('/api/notes', requireDatabaseConnection, notesRoutes);
+app.use('/api/fetch_notes', requireDatabaseConnection, fetchNotesRoutes);
+app.use('/api/fetch_todos', requireDatabaseConnection, fetchTodosRoute);
+app.use(
+  '/api/fetch_resource_library',
+  requireDatabaseConnection,
+  fetchResourceLibraryRoute
+);
+if (uploadResourceLibraryRouter) {
+  app.use('/api', uploadResourceLibraryRouter);
+} else {
+  app.post('/api/resource_upload', unsupportedOnVercel);
+}
+app.use('/api/resource_library', requireDatabaseConnection, resourceLibraryRoutes);
+app.use('/api/todos', requireDatabaseConnection, todosRoute);
+app.use('/api/discussion_forum', requireDatabaseConnection, discussionForumRoutes);
+app.use('/api/fetch_quiz_subjects', requireDatabaseConnection, fetchQuizSubjectsRoutes);
+app.use('/api/quiz_scores', requireDatabaseConnection, quizScoresRoutes);
+app.use('/api/fetch_total_scores', requireDatabaseConnection, fetchTotalScoresRoutes);
+app.use('/api/upcoming_classes', requireDatabaseConnection, fetchUpcomingClassesRoutes);
 app.use('/api/ask_cohere', askCohereRoute);
-app.use('/api/add_attendance', addAttendanceRoutes);
-app.use('/api/update_attendance', updateAttendanceRoute);
-app.use('/api/cgpa_distribution', cgpaDistributionRoute);
-app.use('/api/attendance_summary', attendanceSummaryRoute);
-app.use('/api/todo_summary', todoSummaryRoute);
-app.use('/api/user_register', userRegisterRouter);
+app.use('/api/add_attendance', requireDatabaseConnection, addAttendanceRoutes);
+app.use('/api/update_attendance', requireDatabaseConnection, updateAttendanceRoute);
+app.use('/api/cgpa_distribution', requireDatabaseConnection, cgpaDistributionRoute);
+app.use('/api/attendance_summary', requireDatabaseConnection, attendanceSummaryRoute);
+app.use('/api/todo_summary', requireDatabaseConnection, todoSummaryRoute);
+app.use('/api/user_register', requireDatabaseConnection, userRegisterRouter);
 
-app.use('/users', usersRouter);
-app.use('/register', userRegisterRouter);
-app.use('/login', userLoginRouter);
+app.use('/users', requireDatabaseConnection, usersRouter);
+app.use('/register', requireDatabaseConnection, userRegisterRouter);
+app.use('/login', requireDatabaseConnection, userLoginRouter);
 
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === 'production' && !isVercel) {
   if (existsSync(clientIndexPath)) {
     app.use(express.static(clientDistDir));
     app.get('/{*splat}', (req, res, next) => {
@@ -120,4 +231,8 @@ if (process.env.NODE_ENV === 'production') {
   }
 }
 
-app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`));
+if (!isVercel) {
+  app.listen(PORT, HOST, () => console.log(`Server running on ${HOST}:${PORT}`));
+}
+
+export default app;

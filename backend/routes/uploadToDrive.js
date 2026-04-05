@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 import { oAuth2Client } from "../utils/googleAuth.js";
 
 
-dotenv.config();
+dotenv.config({ quiet: true });
 
 const router = express.Router();
 export const upload = multer({ dest: "uploads/" }); // temp storage
