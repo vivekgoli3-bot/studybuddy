@@ -35,7 +35,7 @@ function AddTaskForm({ username = 'anonymous' }) {
     payload.category = formData.category || '';
 
     try {
-      const res = await fetch('http://localhost:5000/api/todos', {
+      const res = await fetch('/api/todos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -70,7 +70,7 @@ function AddTaskForm({ username = 'anonymous' }) {
       });
     } catch (err) {
       console.error('Failed to POST todo:', err);
-      alert('Network error while adding task. Is the server running on http://localhost:5000?');
+      alert('Network error while adding task. Check that the backend is running and reachable.');
     }
   };
 

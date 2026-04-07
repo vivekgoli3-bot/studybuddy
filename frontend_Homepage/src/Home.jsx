@@ -48,7 +48,7 @@ const StudyBuddy = ({ username }) => {
     setPendingTasksLoading(true);
     try {
       console.log('Fetching pending tasks for username:', username); // Debug log
-      const response = await fetch(`http://localhost:5000/api/todos/pending?username=${username}`);
+      const response = await fetch(`/api/todos/pending?username=${username}`);
       const text = await response.text();
       console.log('Raw response:', text); // Debug log
 
@@ -79,7 +79,7 @@ const StudyBuddy = ({ username }) => {
       const fetchAttendanceSummary = async () => {
         try {
           setAttendanceSummaryLoading(true);
-          const response = await fetch(`http://localhost:5000/api/attendance_summary/average/${username}`);
+          const response = await fetch(`/api/attendance_summary/average/${username}`);
           const data = await response.json();
           console.log('Attendance summary response:', data); // Debug log
           if (data.success) {
@@ -97,7 +97,7 @@ const StudyBuddy = ({ username }) => {
       const fetchTodoSummary = async () => {
         try {
           setTodoSummaryLoading(true);
-          const res = await fetch(`http://localhost:5000/api/todo_summary/${username}`);
+          const res = await fetch(`/api/todo_summary/${username}`);
           const result = await res.json();
           console.log('Todo summary response:', result);
           if (result && result.success) {
@@ -152,7 +152,7 @@ const StudyBuddy = ({ username }) => {
       const fetchTotalClasses = async () => {
         try {
           setTotalClassesLoading(true);
-          const response = await fetch(`http://localhost:5000/api/attendance_summary/total_classes/${username}`);
+          const response = await fetch(`/api/attendance_summary/total_classes/${username}`);
           const data = await response.json();
           if (data.success) {
             setTotalClassesSummary(data);
@@ -173,7 +173,7 @@ const StudyBuddy = ({ username }) => {
     const fetchUpcomingClasses = async () => {
       try {
         setClassesLoading(true);
-        const response = await fetch('http://localhost:5000/api/upcoming_classes');
+        const response = await fetch('/api/upcoming_classes');
         const data = await response.json();
         if (data.success) {
           setUpcomingClasses(data.classes);
@@ -218,7 +218,7 @@ const StudyBuddy = ({ username }) => {
     
     setIsChatLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/ask_cohere', {
+      const response = await fetch('/api/ask_cohere', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -254,7 +254,7 @@ const StudyBuddy = ({ username }) => {
       setAttendanceLoading(true);
       setAttendanceError('');
       try {
-        const res = await fetch(`http://localhost:5000/api/attendance/${username}`);
+        const res = await fetch(`/api/attendance/${username}`);
         const text = await res.text().catch(() => '');
         let json = null;
         try { json = text ? JSON.parse(text) : null; } catch { json = null; }
@@ -296,7 +296,7 @@ const StudyBuddy = ({ username }) => {
       setNotesLoading(true);
       setNotesError('');
       try {
-        const res = await fetch(`http://localhost:5000/api/fetch_notes/${username}`);
+        const res = await fetch(`/api/fetch_notes/${username}`);
         const text = await res.text().catch(() => '');
         let json = null;
         try { json = text ? JSON.parse(text) : null; } catch { json = null; }
@@ -335,7 +335,7 @@ const StudyBuddy = ({ username }) => {
       setTodosLoading(true);
       setTodosError('');
       try {
-        const res = await fetch(`http://localhost:5000/api/fetch_todos/${username}`);
+        const res = await fetch(`/api/fetch_todos/${username}`);
         const text = await res.text().catch(() => '');
         let json = null;
         try { json = text ? JSON.parse(text) : null; } catch { json = null; }
@@ -375,7 +375,7 @@ const StudyBuddy = ({ username }) => {
       setResourceCountsLoading(true);
       setResourceCountsError('');
       try {
-        const res = await fetch('http://localhost:5000/api/fetch_resource_library/type_count');
+        const res = await fetch('/api/fetch_resource_library/type_count');
         const text = await res.text().catch(() => '');
         let json = null;
         try { json = text ? JSON.parse(text) : null; } catch { json = null; }
@@ -412,7 +412,7 @@ const StudyBuddy = ({ username }) => {
     setResourcesByTypeError('');
     setResourcesByTypeLoading(true);
     try {
-      const res = await fetch(`http://localhost:5000/api/fetch_resource_library/type/${encodeURIComponent(type)}`);
+      const res = await fetch(`/api/fetch_resource_library/type/${encodeURIComponent(type)}`);
       const text = await res.text().catch(() => '');
       let json = null;
       try { json = text ? JSON.parse(text) : null; } catch { json = null; }
@@ -473,7 +473,7 @@ const StudyBuddy = ({ username }) => {
           .map(([key, value]) => [key, parseFloat(value)])
       );
 
-      const response = await fetch('http://localhost:5000/api/cgpa_distribution', {
+      const response = await fetch('/api/cgpa_distribution', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -511,7 +511,7 @@ const StudyBuddy = ({ username }) => {
   const handleCgpaUpdate = async () => {
     try {
       setUpdateCgpaLoading(true);
-      const response = await fetch(`http://localhost:5000/api/cgpa_distribution/${username}`, {
+      const response = await fetch(`/api/cgpa_distribution/${username}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -543,7 +543,7 @@ const StudyBuddy = ({ username }) => {
   useEffect(() => {
     const fetchCGPA = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/grades/cgpa');
+        const response = await fetch('/api/grades/cgpa');
         const data = await response.json();
         setCgpaData(data);
       } catch (error) {
@@ -561,7 +561,7 @@ const StudyBuddy = ({ username }) => {
     const fetchCGPADistribution = async () => {
       if (!username) return;
       try {
-        const response = await fetch(`http://localhost:5000/api/cgpa_distribution/${username}`);
+        const response = await fetch(`/api/cgpa_distribution/${username}`);
         const data = await response.json();
         if (data.success && data.data) {
           setCgpaData(data.data);
@@ -1028,7 +1028,7 @@ const StudyBuddy = ({ username }) => {
     
     setAddingAttendance(true);
     try {
-      const response = await fetch('http://localhost:5000/api/add_attendance', {
+      const response = await fetch('/api/add_attendance', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -1050,7 +1050,7 @@ const StudyBuddy = ({ username }) => {
         });
         setShowAddAttendance(false);
         // Refresh attendance data
-        const attendanceRes = await fetch(`http://localhost:5000/api/attendance/${username}`);
+        const attendanceRes = await fetch(`/api/attendance/${username}`);
         const data = await attendanceRes.json();
         setAttendanceData(Array.isArray(data) ? data : data.data || []);
       } else {
@@ -1070,7 +1070,7 @@ const StudyBuddy = ({ username }) => {
 
     setUpdatingAttendance(true);
     try {
-      const response = await fetch('http://localhost:5000/api/update_attendance', {
+      const response = await fetch('/api/update_attendance', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1086,7 +1086,7 @@ const StudyBuddy = ({ username }) => {
         setUpdateAttendance({ subjectName: '', newClassTaken: '', newClassesAttended: '' });
         // refresh attendance data
         try {
-          const attendanceRes = await fetch(`http://localhost:5000/api/attendance/${username}`);
+          const attendanceRes = await fetch(`/api/attendance/${username}`);
           const text = await attendanceRes.text().catch(() => '');
           let data = null;
           try { data = text ? JSON.parse(text) : null; } catch { data = null; }
@@ -1414,7 +1414,7 @@ const StudyBuddy = ({ username }) => {
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/todos/${taskId}`, {
+      const response = await fetch(`/api/todos/${taskId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -1510,7 +1510,7 @@ const StudyBuddy = ({ username }) => {
 
     const fetchCGPAData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/cgpa_distribution/${username}`);
+        const response = await fetch(`/api/cgpa_distribution/${username}`);
         const result = await response.json();
         if (result.success) {
           setCgpaData(result.data);
@@ -1526,7 +1526,7 @@ const StudyBuddy = ({ username }) => {
 
     const handleUpdateSGPA = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/cgpa_distribution/${username}`, {
+        const response = await fetch(`/api/cgpa_distribution/${username}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
@@ -1553,7 +1553,7 @@ const StudyBuddy = ({ username }) => {
           Object.entries(addData.sgpa).filter(([_, value]) => value !== '')
         );
         
-        const response = await fetch('http://localhost:5000/api/cgpa_distribution', {
+        const response = await fetch('/api/cgpa_distribution', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -2032,7 +2032,7 @@ const StudyBuddy = ({ username }) => {
     setDiscussionsLoading(true);
     setDiscussionsError('');
     try {
-      const res = await fetch('http://localhost:5000/api/discussion_forum');
+      const res = await fetch('/api/discussion_forum');
       if (!res.ok) {
         throw new Error('Failed to fetch discussions');
       }
@@ -2057,7 +2057,7 @@ const StudyBuddy = ({ username }) => {
     if (!newQuestionText?.trim()) return;
     setSubmittingQuestion(true);
     try {
-      const res = await fetch('http://localhost:5000/api/discussion_forum', {
+      const res = await fetch('/api/discussion_forum', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, question: newQuestionText.trim() })
@@ -2110,7 +2110,7 @@ const StudyBuddy = ({ username }) => {
     setLikingIds(prev => ({ ...prev, [id]: true }));
 
     try {
-      const url = `http://localhost:5000/api/discussion_forum/${encodeURIComponent(id)}/like`;
+      const url = `/api/discussion_forum/${encodeURIComponent(id)}/like`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -2154,7 +2154,7 @@ const StudyBuddy = ({ username }) => {
     setLikingAnswerIds(prev => ({ ...prev, [answerId]: true }));
 
     try {
-      const url = `http://localhost:5000/api/discussion_forum/${encodeURIComponent(questionId)}/like`;
+      const url = `/api/discussion_forum/${encodeURIComponent(questionId)}/like`;
       const res = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -2305,7 +2305,7 @@ const StudyBuddy = ({ username }) => {
                                   
                                   setSubmittingAnswers(prev => ({ ...prev, [d._id]: true }));
                                   try {
-                                    const res = await fetch(`http://localhost:5000/api/discussion_forum/${encodeURIComponent(d._id)}/answer`, {
+                                    const res = await fetch(`/api/discussion_forum/${encodeURIComponent(d._id)}/answer`, {
                                       method: 'PUT',
                                       headers: { 'Content-Type': 'application/json' },
                                       body: JSON.stringify({

@@ -84,7 +84,7 @@ export default function ResourceUploadUI({ username = 'anonymous' }) {
         console.log('FormData entry:', pair[0], pair[1] && pair[1].name ? pair[1].name : pair[1]);
       }
 
-      const uploadRes = await fetch('http://localhost:5000/api/resource_upload', {
+      const uploadRes = await fetch('/api/resource_upload', {
         method: 'POST',
         body: formData,
       });
@@ -144,7 +144,7 @@ export default function ResourceUploadUI({ username = 'anonymous' }) {
 
           console.log('DEBUG posting metadata to /api/resource_library', payload);
 
-          const notifyRes = await fetch('http://localhost:5000/api/resource_library', {
+          const notifyRes = await fetch('/api/resource_library', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

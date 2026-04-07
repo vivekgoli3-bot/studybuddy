@@ -76,7 +76,7 @@ export default function FileUploadUI({ username = 'anonymous' }) {
         console.log('FormData entry:', pair[0], pair[1] && pair[1].name ? pair[1].name : pair[1]);
       }
 
-      const uploadRes = await fetch('http://localhost:5000/api/upload', {
+      const uploadRes = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
@@ -108,7 +108,7 @@ export default function FileUploadUI({ username = 'anonymous' }) {
 
       console.log('DEBUG posting notes payload', notePayload);
 
-      const notesRes = await fetch('http://localhost:5000/api/notes', {
+      const notesRes = await fetch('/api/notes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(notePayload)
